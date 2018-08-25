@@ -1,11 +1,11 @@
-int N = 400;
+int N = 1000;
 PVector zero = new PVector(0, 0);
 PVector posDiff;
 float posDiffSq;
 float dRad = 5;
 float dDensity = 1;
 Planet pi, pj;
-float G = 0.001;
+float G = 0.00001;
 float c = 0.15;
 float x, y, vx, vy, k;
 float collisionDamping = 0.9;
