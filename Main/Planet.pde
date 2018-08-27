@@ -101,21 +101,62 @@ void rotation() // fix
 {
   if (mousePressed)
   {
-    rotAngle = map(mouseX, 0, width, 0, TWO_PI);
+    rotAngleX = map(mouseY, 0, height, 0, TWO_PI)%TWO_PI;
+    rotAngleY = map(mouseX, 0, width, 0, TWO_PI)%TWO_PI;
   }
-
-  Planet r = p.get(0);
-
-  float rPosx = r.pos.x;
-  float rPosy = r.pos.y;
-  float rPosz = r.pos.z;
-
-  //translate(pPosx, pPosy, pPosz);
-
-
-  translate(-rPosx, -rPosy, 0);
-  rotateY(rotAngle);
-  //scale(0.8);
+  //println("rotAngleX: " + rotAngleX);
+  //println("rotAngleY: " + rotAngleY);
   
-  translate(width/2, height/2, rPosz);
+  PVector CoMPos = CoM();
+  
+  float x = CoMPos.x;
+  float y = CoMPos.y;
+  float z = CoMPos.z;
+
+  translate(x, y, z);
+  rotateX(rotAngleX);
+  rotateY(rotAngleY);
+  scale(0.4);
+  translate(width/2 - 2*x, height/2 - 2*y);
+}
+
+
+void axis()
+{
+  float lineLen = 100;
+  strokeWeight(4);
+  translate(width/2, height/2);
+
+  stroke(255, 0, 0); // RED X axis
+  line(0, lineLen, 0, 0, 0, 0);
+
+  stroke(0, 255, 0); // GREEN Y axis
+  line(0, 0, 0, lineLen, 0, 0);
+
+  stroke(0, 0, 255); // BLUE Z axis
+  line(0, 0, 0, 0, 0, lineLen);
+  
+  translate(-width/2, -height/2);
+}
+Planet planet;
+
+
+PVector CoM()
+{
+  totMass = 0;
+  PVector CoMPos = new PVector();
+  for (int i = 0; i < p.size(); i++)
+  {
+    planet = p.get(i);
+    CoMPos.add(planet.pos.copy().mult(planet.mass));
+    totMass = totMass + planet.mass;
+  }
+  PVector output = CoMPos.div(totMass);
+    
+  //CoMPos.set(zero);
+  //totMass = 0;
+  
+  //println(output);
+  return output;
+
 }
