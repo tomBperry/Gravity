@@ -1,4 +1,4 @@
-int N = 150;
+int N = 100;
 int setFrameRate = 60;
 float G = 0.00002;
 float c = 0.015;
@@ -16,19 +16,21 @@ Planet pi, pj;
 ArrayList<Planet> p = new ArrayList<Planet>();
 PVector posDiff;
 
+
 void setup()
 {  
-  size(800, 800, P3D);
+  size(950, 1000, P3D);
   frameRate(setFrameRate);
-  lights();
   
-  p.add(new Planet(width/2, height/2, 0,  10, 0, 0, 5 * dRad, dDensity * 5));
+  p.add(new Planet(width/2, height/2, 0,  3, 0, 0, 10 * dRad, dDensity * 1000));
 
   for (int i = 0; i < N; i = i + 1) 
   {
     float theta = map(i, 0, N, 0, 360);
     float r = random(width/2);
-    
+   
+    //x = random(width);
+    //y = random(height);
     x = width / 2 + r * cos(theta);
     y = height /2 + r * sin(theta);
     z = random(-400, 400);
@@ -39,15 +41,15 @@ void setup()
     vy = r * cos(theta);
     vz = random(-0.1, 0.1);
     
-    
-    //x = random(width);
-    //y = random(height);
     k = random(0.1, 2);
+    
     p.add(new Planet(x, y, z, vx, vy, vz, k * dRad, dDensity * random(1,5)));
 
     size = p.size();
   }
 }
+
+
 
 
 void draw()

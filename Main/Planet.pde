@@ -104,12 +104,18 @@ void rotation() // fix
     rotAngle = map(mouseX, 0, width, 0, TWO_PI);
   }
 
-  float pPosx = p.get(0).pos.x;
-  float pPosy = p.get(0).pos.y;
-  float pPosz = p.get(0).pos.z;
+  Planet r = p.get(0);
 
-  translate(pPosx, pPosy, pPosz);
-  scale(0.8);
+  float rPosx = r.pos.x;
+  float rPosy = r.pos.y;
+  float rPosz = r.pos.z;
+
+  //translate(pPosx, pPosy, pPosz);
+
+
+  translate(-rPosx, -rPosy, 0);
   rotateY(rotAngle);
-  translate(-pPosx, -pPosy, -pPosz);
+  //scale(0.8);
+  
+  translate(width/2, height/2, rPosz);
 }
