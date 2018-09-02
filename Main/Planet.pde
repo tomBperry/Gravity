@@ -116,7 +116,7 @@ void rotation() // fix
   translate(x, y, z);
   rotateX(rotAngleX);
   rotateY(rotAngleY);
-  scale(0.4);
+  scale(0.9);
   translate(width/2 - 2*x, height/2 - 2*y);
 }
 
@@ -159,4 +159,17 @@ PVector CoM()
   //println(output);
   return output;
 
+}
+
+float calcReducedMass()
+{
+  float temp = 0;
+  
+  for (int i = 0; i < p.size(); i++)
+  {
+    planet = p.get(i);
+    temp = temp + 1/planet.mass;
+  }
+  println(1/temp);
+  return 1/temp;
 }
