@@ -99,31 +99,64 @@ float cube(float num)
 
 void rotation() // fix
 {
+  float rotationSpeed = 0.1;
   if (mousePressed)
   {
-    rotAngleX = map(mouseY, 0, height, 0, TWO_PI)%TWO_PI;
-    rotAngleY = map(mouseX, 0, width, 0, TWO_PI)%TWO_PI;
+
+    if (keyPressed && key == TAB)
+    {
+      if (mouseX > width/2)
+      {
+        rotAngleY += rotationSpeed; //map(mouseY, 0, height, 0, TWO_PI);//%TWO_PI;
+        //rotAngleY = map(mouseX, 0, width, 0, TWO_PI);//%TWO_PI;
+      } else
+      {
+        rotAngleY -= rotationSpeed;
+      }
+    } else
+    {
+      if (mouseY > height/2)
+      {
+        rotAngleX += rotationSpeed; //map(mouseY, 0, height, 0, TWO_PI);//%TWO_PI;
+        //rotAngleX = map(mouseX, 0, width, 0, TWO_PI);//%TWO_PI;
+      } else
+      {
+        rotAngleX -= rotationSpeed;
+      }
+    }
   }
+
   //println("rotAngleX: " + rotAngleX);
   //println("rotAngleY: " + rotAngleY);
-  
-  PVector CoMPos = CoM();
-  
-  float x = CoMPos.x;
-  float y = CoMPos.y;
-  float z = CoMPos.z;
 
-  translate(x, y, z);
+  PVector CoMPos = CoM();
+
+  PVector centrePlanet = p.get(0).pos.mult(0.5);
+
+
+
+  float x = width/2 +centrePlanet.x;//CoMPos.x;
+  float y = height/2+ centrePlanet.y;//CoMPos.y;
+  float z = 1000/2 + centrePlanet.z;//CoMPos.z;
+
+
+  translate(x, y, z);//width/2 +CoMPos.x, height/2+CoMPos.y, 1000/2 +CoMPos.z);
+  axis();
+
+  stroke(255);
+
   rotateX(rotAngleX);
   rotateY(rotAngleY);
-  scale(0.9);
-  translate(width/2 - 2*x, height/2 - 2*y);
+  line(0, 0, 0, CoMPos.x, CoMPos.y, CoMPos.z);
+
+  //scale(1);
+  //translate(100, 100, 100);//width/2 - 2*x, height/2 - 2*y);
 }
 
 
 void axis()
 {
-  float lineLen = 100;
+  float lineLen = 200;
   strokeWeight(4);
   translate(width/2, height/2);
 
@@ -135,7 +168,7 @@ void axis()
 
   stroke(0, 0, 255); // BLUE Z axis
   line(0, 0, 0, 0, 0, lineLen);
-  
+
   translate(-width/2, -height/2);
 }
 Planet planet;
@@ -152,24 +185,23 @@ PVector CoM()
     totMass = totMass + planet.mass;
   }
   PVector output = CoMPos.div(totMass);
-    
+
   //CoMPos.set(zero);
   //totMass = 0;
-  
+
   //println(output);
   return output;
-
 }
 
-float calcReducedMass()
+float calcReducedMass()  
 {
   float temp = 0;
-  
+
   for (int i = 0; i < p.size(); i++)
   {
     planet = p.get(i);
     temp = temp + 1/planet.mass;
   }
-  println(1/temp);
+  //println("inverse temp: " +1/temp);
   return 1/temp;
 }
