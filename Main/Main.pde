@@ -1,14 +1,21 @@
 //Add a reset button with sliders
 
 
+// tab jumps between planets but seems to move the new selected planet to be the centre 
+// to the origin next to the previous selected planet.
+
 int N = 0;
-int setFrameRate = 100;
+int setFrameRate = 3;
 int cutDist = 10000; // distance at which to eliminate planets.
 int randVelAdd = 1;
-float G = 0.005; // 0.001 for sun and two planets
+float G = 0.01; // 0.001 for sun and two planets
 float c = 3;
-float dRad = 5;
+float dRad = 5.5;
 float dDensity = 1;
+
+float AU = 1000;
+float v0;// = sqrt(G*//20;
+
 float collisionDamping = 1;
 float rotAngleX, rotAngleY = 0;
 float totMass = 0;
@@ -23,8 +30,24 @@ ArrayList<Planet> p = new ArrayList<Planet>();
 PVector posDiff;
 
 
+PrintWriter output;
+float dr, dv;
+float minima = 0;
+
+
+float scaleFactor = 0.5;
+
+float prevdr=0, prev2dr=0;
+
+int centreP = 0;
+
+
+
 void setup()
 {  
+  output = createWriter("output.txt");
+
+  frame.setLocation(100, 100);
   size(1500, 2000, P3D);
   frameRate(setFrameRate);
 
@@ -32,11 +55,17 @@ void setup()
   //c = 0.1;// *  (float)Math.pow((double)reducedMass * G, 0.5);
   //Planet(float x0, float y0, float z0, float vx0, float vy0, float vz0, float radius, float density)
 
-  p.add(new Planet(width/2 - 10, height/2, 0, 0, 0.9, 0, 3 * dRad, dDensity));
-  p.add(new Planet(width/2 + 30, height/2, 0, 0, -0.1, 0, 2 * dRad, dDensity));
-  p.add(new Planet(width/2 - 40, height/2, 0, 0, -0.6, 0, 1 * dRad, dDensity));
+  p.add(new Planet(0, 0, 0, 0, 0, 0, 5 * dRad, dDensity * 100));
 
-  p.add(new Planet(width/2, height/2, 0,  0, 0, 0, 10 * dRad, dDensity * 5));
+  v0 = sqrt(G*p.get(0).mass/AU);
+
+  p.add(new Planet(0, AU, 0, v0, 0, 0, 3 * dRad, dDensity));
+
+  float dis = 30;
+  v0 = v0 - sqrt(G*p.get(1).mass/dis);
+  
+  p.add(new Planet(0, AU - dis, 0, v0, 0, 0, 0.5*dRad, dDensity));
+  //p.add(new Planet(0.1*width/4 - 40, 0.1*height/4, 0, 0, -0.6*v0, 0, 1 * dRad, dDensity));
 
   //p.add(new Planet(width/2 + 400, height/2, 0,  0, 2.2, 0, 1 * dRad, dDensity));
   //p.add(new Planet(width/2 + 408, height/2, 0,  0, 2.44, 0, 0.2 * dRad, dDensity));
@@ -82,12 +111,13 @@ void draw()
   lights();
 
 
+
   size = p.size();
-  if (frameCount%setFrameRate == 0)
-  {
-    println("No. Planets: " +size);
-    println("FrameRate: " + frameRate);
-  }
+  //if (frameCount%setFrameRate == 0)
+  //{
+  //  println("No. Planets: " +size);
+  //  println("FrameRate: " + frameRate);
+  //}
 
   rotation(); // These two cost about 2 - 4 frames (at N = 200)
 
@@ -95,6 +125,7 @@ void draw()
   //{
   //  p.get(i).update();
   //}
+
 
 
 
@@ -126,12 +157,12 @@ void draw()
             {
               if (pi.mass > pj.mass)
               {
-                aggregate(pi, pj);
-                p.remove(j);
+                //aggregate(pi, pj);
+                //p.remove(j);
               } else
               {
-                aggregate(pj, pi);
-                p.remove(i);
+                //aggregate(pj, pi);
+                //p.remove(i);
               }
             } else
             {
@@ -157,4 +188,7 @@ void draw()
   //println("Total mass: " + totMass);
   //totMass = 0;
   //println("No. of Planets: " + p.size());
+
+
+  outputData();
 }

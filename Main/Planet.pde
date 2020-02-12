@@ -99,58 +99,57 @@ float cube(float num)
 
 void rotation() // fix
 {
-  float rotationSpeed = 0.1;
-  if (mousePressed)
-  {
+  //float rotationSpeed = 0.05;
+  //if (mousePressed)
+  //{
 
-    if (keyPressed && key == TAB)
-    {
-      if (mouseX > width/2)
-      {
-        rotAngleY += rotationSpeed; //map(mouseY, 0, height, 0, TWO_PI);//%TWO_PI;
-        //rotAngleY = map(mouseX, 0, width, 0, TWO_PI);//%TWO_PI;
-      } else
-      {
-        rotAngleY -= rotationSpeed;
-      }
-    } else
-    {
-      if (mouseY > height/2)
-      {
-        rotAngleX += rotationSpeed; //map(mouseY, 0, height, 0, TWO_PI);//%TWO_PI;
-        //rotAngleX = map(mouseX, 0, width, 0, TWO_PI);//%TWO_PI;
-      } else
-      {
-        rotAngleX -= rotationSpeed;
-      }
-    }
-  }
+  //  if (keyPressed && key == TAB)
+  //  {
+  //    if (mouseX > width/2)
+  //    {
+  //      rotAngleY += rotationSpeed; //map(mouseY, 0, height, 0, TWO_PI);//%TWO_PI;
+  //      //rotAngleY = map(mouseX, 0, width, 0, TWO_PI);//%TWO_PI;
+  //    } else
+  //    {
+  //      rotAngleY -= rotationSpeed;
+  //    }
+  //  } else
+  //  {
+  //    if (mouseY > height/2)
+  //    {
+  //      rotAngleX += rotationSpeed; //map(mouseY, 0, height, 0, TWO_PI);//%TWO_PI;
+  //      //rotAngleX = map(mouseX, 0, width, 0, TWO_PI);//%TWO_PI;
+  //    } else
+  //    {
+  //      rotAngleX -= rotationSpeed;
+  //    }
+  //  }
+  //}
 
   //println("rotAngleX: " + rotAngleX);
-  //println("rotAngleY: " + rotAngleY);
+  //println("rotAngleY: " + rotAngleY);    
 
   PVector CoMPos = CoM();
 
-  PVector centrePlanet = p.get(0).pos.mult(0.5);
+  PVector centrePlanet = p.get(centreP).pos.mult(0.5);
 
 
 
-  float x = width/2 +centrePlanet.x;//CoMPos.x;
-  float y = height/2+ centrePlanet.y;//CoMPos.y;
-  float z = 1000/2 + centrePlanet.z;//CoMPos.z;
+  float x = width/2 +centrePlanet.x;//CoMPos.x //width/2 +CoMPos.x
+  float y = height/2+ centrePlanet.y;//CoMPos.y; //height/2+CoMPos.y
+  float z = 1000/2 + centrePlanet.z;//CoMPos.z; //1000/2 +CoMPos.z
 
 
-  translate(x, y, z);//width/2 +CoMPos.x, height/2+CoMPos.y, 1000/2 +CoMPos.z);
-  axis();
+  translate(x, y, z);
+  //axis();
 
-  stroke(255);
+  //stroke(255);
 
-  rotateX(rotAngleX);
-  rotateY(rotAngleY);
-  line(0, 0, 0, CoMPos.x, CoMPos.y, CoMPos.z);
+  //rotateX(rotAngleX);
+  //rotateY(rotAngleY);
+  //line(0, 0, 0, CoMPos.x, CoMPos.y, CoMPos.z);
 
-  //scale(1);
-  //translate(100, 100, 100);//width/2 - 2*x, height/2 - 2*y);
+  scale(scaleFactor);
 }
 
 
@@ -178,7 +177,7 @@ PVector CoM()
 {
   totMass = 0;
   PVector CoMPos = new PVector();
-  for (int i = 0; i < p.size(); i++)
+  for (int i = 0; i < size; i++)
   {
     planet = p.get(i);
     CoMPos.add(planet.pos.copy().mult(planet.mass));
@@ -197,11 +196,90 @@ float calcReducedMass()
 {
   float temp = 0;
 
-  for (int i = 0; i < p.size(); i++)
+  for (int i = 0; i < size; i++)
   {
     planet = p.get(i);
     temp = temp + 1/planet.mass;
   }
   //println("inverse temp: " +1/temp);
   return 1/temp;
+}
+
+
+void outputData()
+{
+  textSize(30);
+  Planet test = p.get((centreP + 1) % size);
+
+
+  if (frameCount == 0)
+  {
+    prevdr = 0;
+    prev2dr = 0;
+  }
+
+
+  // Finding the apo/perihelion of the orbit
+  prev2dr = prevdr;// 1
+  prevdr = dr;
+  dr = test.pos.sub(p.get(0).pos).mag();
+  dv = test.vel.mag();
+
+  //println("prev2dr: " + str(prev2dr));
+  //println("prevdr: " + str(prevdr));
+  //println("dr: " + str(dr));
+
+
+  if (dr > prevdr && prevdr < prev2dr)   // for minima find it then output in the next cycle where the maxima is found
+  {
+    minima = prevdr;
+    //println("Minima: "+str(minima));
+  }
+
+  if (dr < prevdr && prevdr > prev2dr) // max r
+  {
+    //println("Maxima");
+    output.println(str(frameCount) + ";" + str(prevdr)+ ";" + str(minima));
+  }
+
+
+
+  // Display the stats by the planet
+  text("r: " + str(dr), test.pos.x + 20, test.pos.y, test.pos.z);
+  text("v: " + str(dv), test.pos.x + 20, test.pos.y + 30, test.pos.z);
+}
+
+
+void keyPressed()
+{
+  if (key == ESC)
+  {
+    output.flush();
+    output.close();
+    exit();
+  }
+
+  if (key == RETURN)  
+  {
+    scaleFactor += 0.01;
+  }
+
+  if (key == BACKSPACE)
+  {
+    scaleFactor -= 0.01;
+  }
+  
+  if (key == TAB)
+  {
+    println("Old:" + str(centreP));
+    centreP ++;
+    
+    
+    if (centreP > size-1)
+    {
+      centreP = 0;
+    }
+    println("New: " + str(centreP));
+  }
+  
 }
